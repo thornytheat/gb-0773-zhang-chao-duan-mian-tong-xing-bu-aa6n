@@ -13,6 +13,7 @@
 | M5 船期覆盖勾稽 | 回查申请时点和时长差额 | `/api/stage/coverage` | `app/modules/schedule/service.py` | `tests/test_coverage.py` |
 | M6 批次留档复跑 | 同源复算及归档查阅 | `/api/journal` | `app/modules/journal/service.py` `app/modules/journal/store.py` | `tests/test_journal.py` |
 | M7 潮窗证据签发 | 验证原件及报告摘要 | `/api/export/<id>` | `app/modules/proof/service.py` | `tests/test_proof.py` |
+| M8 清淤安排试算 | 对照现状核两潮放行并留档 | `/api/dredging/trials` `/desk/dredging` | `app/modules/dredging/service.py` `app/modules/dredging/trial.py` `app/modules/dredging/store.py` | `tests/test_dredging.py` |
 
 | TRAP | 现象 | 朴素处理后果 | 处理 | 位置 | 测试 |
 |---|---|---|---|---|---|
@@ -26,5 +27,9 @@
 | TRAP-15 | 厘米、米混用 | 水深错档 | 按单位换算后加基准 | `app/modules/datum/resolve.py` | `tests/test_datum.py::test_normalize_unit` |
 | TRAP-19 | 孪站同刻 | 顺序决定选站 | 显式优先级 | `app/modules/datum/resolve.py` | `tests/test_datum.py::test_station_priority` |
 | TRAP-23 | 船期右端 | 重复归属 | 排除右端 | `app/modules/passage/service.py` | `tests/test_windows.py::test_half_open_end` |
+| TRAP-24 | 施工期过断面 | 增深提前生效 | 封航区间判不可行，完工才计增深 | `app/modules/dredging/clock.py` | `tests/test_dredging.py::test_gain_only_after_completion` |
+| TRAP-25 | 缺测段清淤 | 以增深填补缺证 | 缺证原样保留，增深只作用于有据时刻 | `app/modules/dredging/clock.py` | `tests/test_dredging.py::test_unknown_stays_unknown_after_gain` |
+| TRAP-26 | 试算失败 | 半成品入簿 | 异常先于留档抛出，原簿与试算库均不写 | `app/modules/dredging/trial.py` | `tests/test_dredging.py::test_failed_trial_leaves_no_archive` |
+| TRAP-27 | 重复试算 | 同源多次留档 | 四原件哈希定址，冲突沿用原号 | `app/modules/dredging/store.py` | `tests/test_dredging.py::test_trial_persists_once` |
 
 海棠17窗口 3000 秒 = 1500 可行 + 900 不可行 + 600 缺证。潮尺接收 20 条数据，18 条格式采信，11 条进入断面判定，2 条格式隔离、7 条业务隔离。重复表头及空行单计。以分钟级实测样例演示，不覆盖未带偏移的当地时刻、曲线外推和实时设备连接。

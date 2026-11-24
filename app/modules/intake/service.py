@@ -4,9 +4,9 @@ from .contract import HEADERS, SENTINELS
 from .readings import scan
 
 
-def intake(inputs):
+def intake(inputs, headers=HEADERS):
     tables, rejected, files = {}, [], []
-    for name, header in HEADERS.items():
+    for name, header in headers.items():
         rows, malformed, segments, blanks = scan(inputs[name], header, name)
         clean = []
         for record in rows:

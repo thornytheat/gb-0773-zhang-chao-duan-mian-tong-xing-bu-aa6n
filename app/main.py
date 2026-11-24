@@ -5,6 +5,7 @@ from flask import Flask, jsonify
 from app.api import api
 from app.config import PORT
 from app.errors import TideError
+from app.modules.dredging.store import TrialStore
 from app.modules.journal.store import Journal
 from app.web import web
 
@@ -13,6 +14,7 @@ def create_app(database=None):
     app = Flask(__name__)
     app.config['MAX_CONTENT_LENGTH'] = 2_000_000
     app.extensions['tide_journal'] = Journal(database or os.environ.get('TIDE_DB', 'var/tide.sqlite3'))
+    app.extensions['tide_trials'] = TrialStore(database or os.environ.get('TIDE_DB', 'var/tide.sqlite3'))
     app.register_blueprint(api)
     app.register_blueprint(web)
     app.errorhandler(TideError)(lambda error: (jsonify(code=error.code, message=str(error)), error.status))

@@ -4,13 +4,13 @@ from itertools import pairwise
 from .state import SectionClock, judgement
 
 
-def route_windows(crossings):
+def route_windows(crossings, clock_factory=SectionClock):
     result = {}
     for key, rec in crossings.items():
         order = rec['order']
         left, right = order['start'], order['end']
         threshold = Fraction(order['threshold_m'])
-        clocks = [SectionClock(name, section) for name, section in rec['sections'].items()]
+        clocks = [clock_factory(name, section) for name, section in rec['sections'].items()]
         cuts = {left, right}
         cuts.update(cut for clock in clocks for cut in clock.boundaries() if left < cut < right)
         knots = sorted(cuts)
